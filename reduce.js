@@ -10,24 +10,34 @@ var rl = readline.createInterface({
 });
 
 var sequence = [];
+var current_key='';
 
 rl.on('line', function (line) {  
+     
+
+    var key = line.split('\t')[0];
+    var data = JSON.parse(line.split('\t')[1]);
+ 
+    current_key = (current_key === '') ? key : current_key;
     
-    sequence.push(
-        JSON.parse(line.split('\t')[1])
-        
-        );
+    if (current_key !== key) {
+
+        current_key = key;
+        var sortedSequence = sequence.sort(function(a,b){return a.time - b.time});
+        var output ='';
+        for (var i = 0; i < sortedSequence.length; i++) {
+        output = output +  sortedSequence[i].activity + ' -> ';
+        }
+        sequence =[];
+        process.stdout.write(output.substr(0,output.length - 4) + '\n');
+    }
+    sequence.push(data);
 
   //  process.stdout.write( y.time);
 });
 
 rl.on('close', function() {
-     var sortedSequence = sequence.sort(function(a,b){return b.time - a.time});
-     var output ='';
-     for (var i = 0; i < sortedSequence.length; i++) {
-         output = output +  sortedSequence[i].activity + ' -> ';
-     }
-     process.stdout.write(output.substr(0,output.length - 4));
+
 });
 
 

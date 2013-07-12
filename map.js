@@ -3,8 +3,6 @@
 var readline = require('readline');
 var count = 0;
 
-
-console.log("Runnnjinngn");
 var rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
