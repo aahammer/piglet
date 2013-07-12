@@ -1,6 +1,6 @@
 var net = require('net');
 
-var HOST = '127.2.81.129';
+var HOST = 'localhost';
 var PORT = 17000;
 
 var client = new net.Socket();

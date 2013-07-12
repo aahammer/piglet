@@ -3,7 +3,7 @@ var spawn = require('child_process').spawn
 var fs = require('fs');
 
 
-var HOST = process.env.IP;
+var HOST = 'localhost';
 var PORT = 17000;
 
 var shellcommzand = 'echo';
@@ -11,37 +11,29 @@ var shellcommzand = 'echo';
 function command(regexp, callback){
     
 
-var event_command    = spawn('./analyze_events.sh');
+var event_command    =  spawn('./analyze_events.sh',['']);
 
-    event_command.stdout.on('data', function (data) {
-      
-       var trace_command = spawn('./analyze_traces.sh');
-       
-       trace_command.stdout.on('data', function (data) {
-            
-            spawn('rm',['sequence.txt']);
-           
-            var hdsf_pull    = spawn('hadoop',['fs','-pull /process/sequence/part-00000 sequence.txt']);
-            hdsf_pull.stdout.on('data', function (data) {
-                fs.readFile('./local_test_client/process.log', function (err, data) {
-                if (err) throw err;
-                    callback(data);
-                });
-            });
-            fs.readFile('./local_test_client/process.log', function (err, data) {
-                if (err) throw err;
-                    callback(data);
-            });
-            
-        });
-    });
-    
     event_command.stderr.on('data', function (data) {
       console.log('stderr: ' + data);
     });
     
     event_command.on('exit', function (code) {
-      console.log('child process exited with code ' + code);
+      
+	var trace_command = spawn('./analyze_traces.sh', ['']);
+        trace_command.on('exit', function (code) {
+
+            spawn('rm',['sequence.txt']);
+
+             var hdsf_pull    = spawn('hadoop',['fs','-get', '/process/sequence/part-00000','sequence.txt']);
+
+            hdsf_pull.on('exit', function (code) {
+               fs.readFile('sequence.txt', function (err, data) {
+                if (err) throw err;
+                    callback(data);
+                });
+            });
+	});
+        console.log('child process exited with code ' + code);
     });
 }
 
@@ -51,7 +43,7 @@ net.createServer(function(sock) {
     
     sock.on('data', function(data) {
         console.log('DATA ' + sock.remoteAddress + ': ' + data);   
-        command(data, function(result) { sock.write(result);})   
+        command(data, function(result) { sock.write(result);}) ;  
     });
     
     sock.on('close', function(data) {
