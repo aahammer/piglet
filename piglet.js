@@ -1,16 +1,14 @@
 var net = require('net');
-var spawn = require('child_process').spawn
+var spawn = require('child_process').spawn;
 var fs = require('fs');
 
 
-var HOST = 'localhost';
+var HOST = process.env.IP;
 var PORT = 17000;
-
-var shellcommzand = 'echo';
 
 function command(regexp, callback){
     
-
+//regexp passing not yet implement. still hardwired in map_event.js 
 var event_command    =  spawn('./analyze_events.sh',['']);
 
     event_command.stderr.on('data', function (data) {
@@ -41,9 +39,9 @@ net.createServer(function(sock) {
 
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
     
-    sock.on('data', function(data) {
+    sock.on('data', function(regexp) {
         console.log('DATA ' + sock.remoteAddress + ': ' + data);   
-        command(data, function(result) { sock.write(result);}) ;  
+        command(regexp, function(result) { sock.write(result);}) ;  
     });
     
     sock.on('close', function(data) {
