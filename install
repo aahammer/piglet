@@ -1,1 +1,0 @@
-yes | nl | head -1000 | awk '{ printf"1%06d T%04d A%02d\n",$1, $1/9, $1%9 }'
