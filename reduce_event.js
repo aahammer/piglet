@@ -23,13 +23,7 @@ rl.on('line', function (line) {
     if (current_key !== key) {
 
         current_key = key;
-        var sortedSequence = sequence.sort(function(a,b){return a.time - b.time});
-        var output ='';
-        for (var i = 0; i < sortedSequence.length; i++) {
-        output = output +  sortedSequence[i].activity + ' -> ';
-        }
-        sequence =[];
-        process.stdout.write(output.substr(0,output.length - 4) + '\n');
+        output();
     }
     sequence.push(data);
 
@@ -37,7 +31,18 @@ rl.on('line', function (line) {
 });
 
 rl.on('close', function() {
-
+    output();
 });
+
+function output(){
+    
+    var sortedSequence = sequence.sort(function(a,b){return a.time - b.time});
+    var output ='';
+    for (var i = 0; i < sortedSequence.length; i++) {
+    output = output +  sortedSequence[i].activity + ' -> ';
+    }
+    sequence =[];
+    process.stdout.write(output.substr(0,output.length - 4) + '\n');
+}
 
 
